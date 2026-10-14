@@ -18,6 +18,23 @@ use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::time::{Duration, Instant};
 
+/// Suppress the console window for a child process on Windows.
+///
+/// Every `Command` we run (Python probes, the server itself, `taskkill`) must
+/// go through this, otherwise Windows flashes a console window on each spawn —
+/// which looks like a stray cmd prompt appearing when the app starts.
+#[cfg(windows)]
+fn no_window(cmd: &mut Command) -> &mut Command {
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+    cmd.creation_flags(CREATE_NO_WINDOW)
+}
+
+#[cfg(not(windows))]
+fn no_window(cmd: &mut Command) -> &mut Command {
+    cmd
+}
+
 /// A running local STT server, killed when this value is dropped.
 pub struct LocalServer {
     child: Child,
@@ -72,12 +89,7 @@ impl LocalServer {
             cmd.env("UNOFLOW_STT_MODEL", model);
         }
         // Don't pop a console window on Windows.
-        #[cfg(windows)]
-        {
-            use std::os::windows::process::CommandExt;
-            const CREATE_NO_WINDOW: u32 = 0x0800_0000;
-            cmd.creation_flags(CREATE_NO_WINDOW);
-        }
+        no_window(&mut cmd);
 
         match cmd.spawn() {
             Ok(child) => {
@@ -93,11 +105,12 @@ impl LocalServer {
         let pid = self.child.id();
         #[cfg(windows)]
         {
-            let _ = Command::new("taskkill")
-                .args(["/PID", &pid.to_string(), "/T", "/F"])
+            let mut kill = Command::new("taskkill");
+            kill.args(["/PID", &pid.to_string(), "/T", "/F"])
                 .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .status();
+                .stderr(Stdio::null());
+            no_window(&mut kill);
+            let _ = kill.status();
         }
         let _ = self.child.kill();
         let _ = self.child.wait();
@@ -201,23 +214,27 @@ pub fn server_dir() -> Option<PathBuf> {
 /// (e.g. `["-3.10"]` for `py -3.10 server.py`).
 fn python_launcher() -> Option<(String, Vec<String>)> {
     for ver in ["-3.10", "-3.11", "-3.12", "-3"] {
-        let probe = Command::new("py")
-            .args([ver, "-c", "import faster_whisper"])
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .status();
-        if matches!(probe, Ok(s) if s.success()) {
+        if probe_ok("py", &[ver, "-c", "import faster_whisper"]) {
             return Some(("py".into(), vec![ver.into()]));
         }
     }
     // Last resort: a `python` that can import the dependency.
-    let probe = Command::new("python")
-        .args(["-c", "import faster_whisper"])
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status();
-    if matches!(probe, Ok(s) if s.success()) {
+    if probe_ok("python", &["-c", "import faster_whisper"]) {
         return Some(("python".into(), vec![]));
     }
     None
+}
+
+/// Run `exe args…` silently and report whether it exited successfully.
+///
+/// Used for the interpreter probes above. The console window must be
+/// suppressed here too: without it, each probe flashes a cmd window on startup.
+fn probe_ok(exe: &str, args: &[&str]) -> bool {
+    let mut cmd = Command::new(exe);
+    cmd.args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
+    no_window(&mut cmd);
+    matches!(cmd.status(), Ok(s) if s.success())
 }
