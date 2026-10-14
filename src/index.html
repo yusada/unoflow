@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UnoFlow</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="brand">
+          <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
+            <defs>
+              <linearGradient id="brandGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#5588f0" />
+                <stop offset="100%" stop-color="#3466e2" />
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="24" height="24" rx="5.5" fill="url(#brandGrad)" />
+            <path
+              d="M8.6 6.4v6.1a3.4 3.4 0 0 0 6.8 0V6.4"
+              fill="none"
+              stroke="#ffffff"
+              stroke-width="2.1"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span>UnoFlow</span>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-item active" data-view="dictation">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="2.5" width="6" height="11" rx="3" />
+              <path d="M5.5 11a6.5 6.5 0 0 0 13 0" />
+              <path d="M12 17.5V21" />
+            </svg>
+            Dictation
+          </button>
+          <button class="nav-item" data-view="insights">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19V5" /><path d="M4 19h16" />
+              <path d="M8 19v-6" /><path d="M12.5 19V8" /><path d="M17 19v-9" />
+            </svg>
+            Insights
+          </button>
+          <button class="nav-item" data-view="dictionary">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 5.5A2 2 0 0 1 6 3.5h13v17H6a2 2 0 0 1-2-2z" />
+              <path d="M8 3.5v17" />
+            </svg>
+            Dictionary
+          </button>
+          <button class="nav-item" data-view="snippets">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 4h10v16l-5-3.5L7 20z" />
+            </svg>
+            Snippets
+          </button>
+        </nav>
+
+        <div class="spacer"></div>
+
+        <button class="nav-item" id="openSettings">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.7 9a1.7 1.7 0 0 0-.4-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
+          </svg>
+          Settings
+        </button>
+      </aside>
+
+      <!-- Main -->
+      <main class="main">
+        <!-- Dictation / history -->
+        <section class="view" id="view-dictation">
+          <div class="view-head">
+            <h1>Dictation</h1>
+          </div>
+
+          <div class="cols">
+            <div class="col-main">
+              <div class="hero">
+                <div class="hero-text">
+                  <h2>Speak at the speed you think</h2>
+                  <p>Hold <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd>, talk, and release — your words land in whatever app has focus.</p>
+                  <div class="hero-actions">
+                    <button class="btn primary" id="heroInsert" disabled>Insert last</button>
+                    <button class="btn" id="heroCopy" disabled>Copy last</button>
+                  </div>
+                </div>
+                <div class="hero-art" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                    <path d="M4 12v.5" /><path d="M8 8.5v7" /><path d="M12 5.5v13" /><path d="M16 8.5v7" /><path d="M20 12v.5" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="section-head">
+                <span class="eyebrow">Recent</span>
+                <div class="section-tools">
+                  <input id="historySearch" class="search" placeholder="Search…" />
+                  <button class="icon-btn" id="clearHistory" title="Clear all history">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 7h16" /><path d="M9 7V5h6v2" />
+                      <path d="M6 7l1 13h10l1-13" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <ul class="history" id="historyList"></ul>
+              <p class="empty" id="historyEmpty">No dictations yet.</p>
+            </div>
+
+            <div class="col-side">
+              <div class="card">
+                <div class="stat"><b id="statWords">0</b><span>total words</span></div>
+                <div class="stat"><b id="statWpm">0</b><span>wpm</span></div>
+                <div class="stat"><b id="statStreak">0</b><span>day streak</span></div>
+              </div>
+              <div class="card">
+                <h3>Live status</h3>
+                <p class="status-line">
+                  <span class="dot" id="dot" data-state="idle"></span>
+                  <span id="status">Idle</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Insights -->
+        <section class="view hidden" id="view-insights">
+          <div class="view-head"><h1>Insights</h1></div>
+          <p class="lede">How you actually use UnoFlow, computed from your local history.</p>
+
+          <div class="stat-grid">
+            <div class="card stat-cell"><b id="iWords">0</b><span>total words</span></div>
+            <div class="card stat-cell"><b id="iEntries">0</b><span>dictations</span></div>
+            <div class="card stat-cell"><b id="iWpm">0</b><span>words / min</span></div>
+            <div class="card stat-cell"><b id="iStreak">0</b><span>day streak</span></div>
+            <div class="card stat-cell"><b id="iAvg">0</b><span>avg words</span></div>
+            <div class="card stat-cell"><b id="iMinutes">0</b><span>minutes spoken</span></div>
+          </div>
+
+          <div class="cols">
+            <div class="col-main">
+              <div class="section-head"><span class="eyebrow">Last 14 days</span></div>
+              <div class="card"><div class="bars" id="iBars"></div></div>
+
+              <div class="section-head" style="margin-top:24px"><span class="eyebrow">Top words</span></div>
+              <div class="card"><ul class="chips" id="iWords2"></ul></div>
+            </div>
+
+            <div class="col-side">
+              <div class="card">
+                <h3>Apps you dictate into</h3>
+                <ul class="applist" id="iApps"></ul>
+                <p class="empty" id="iAppsEmpty">No data yet.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dictionary -->
+        <section class="view hidden" id="view-dictionary">
+          <div class="view-head"><h1>Dictionary</h1></div>
+          <p class="lede">Words and phrases UnoFlow should get right. Applied as a prompt to the model.</p>
+          <div class="card">
+            <div class="row">
+              <input id="dictInput" class="grow" placeholder="Add a word, name, or phrase…" />
+              <button class="btn primary" id="dictAdd">Add</button>
+            </div>
+            <ul class="chips" id="dictList"></ul>
+            <p class="empty" id="dictEmpty">No custom words yet.</p>
+          </div>
+        </section>
+
+        <!-- Snippets -->
+        <section class="view hidden" id="view-snippets">
+          <div class="view-head">
+            <h1>Snippets</h1>
+            <button class="btn primary" id="snipAdd">Add new</button>
+          </div>
+          <p class="lede">Say the trigger, get the expansion. Stored locally.</p>
+          <div class="card">
+            <table class="table" id="snipTable"><tbody id="snipList"></tbody></table>
+            <p class="empty" id="snipEmpty">No snippets yet.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Settings modal -->
+    <div class="overlay hidden" id="settingsOverlay">
+      <div class="modal">
+        <aside class="modal-nav">
+          <div class="eyebrow">Settings</div>
+          <button class="modal-nav-item active">General</button>
+          <button class="modal-nav-item">Transcription</button>
+          <button class="modal-nav-item">Privacy</button>
+        </aside>
+        <div class="modal-body">
+          <h2>General</h2>
+          <div class="panel">
+            <div class="panel-row">
+              <div><b>Shortcut</b><p class="muted">Click Record, then press your keys</p></div>
+              <div class="shortcut-edit">
+                <input id="shortcutInput" class="w-short" readonly placeholder="Ctrl+Shift+Space" />
+                <button class="btn" id="recordShortcut" type="button">Record</button>
+              </div>
+            </div>
+            <div class="panel-row">
+              <div><b>API base URL</b><p class="muted">OpenAI, or a local server</p></div>
+              <input id="baseUrl" class="w-med" placeholder="https://api.openai.com/v1" />
+            </div>
+            <div class="panel-row">
+              <div><b>API key</b><p class="muted" id="keyHint">Blank for a local server</p></div>
+              <input id="apiKey" type="password" class="w-med" placeholder="sk-…" autocomplete="off" />
+            </div>
+            <div class="panel-row">
+              <div><b>Model</b><p class="muted">Transcription model</p></div>
+              <select id="model" class="w-med">
+                <optgroup label="Cloud (OpenAI)">
+                  <option value="gpt-4o-mini-transcribe">gpt-4o-mini-transcribe</option>
+                  <option value="gpt-4o-transcribe">gpt-4o-transcribe</option>
+                  <option value="whisper-1">whisper-1</option>
+                </optgroup>
+                <optgroup label="Local — multilingual (99 languages)">
+                  <option value="tiny">tiny</option>
+                  <option value="base">base</option>
+                  <option value="small">small</option>
+                  <option value="medium">medium</option>
+                </optgroup>
+                <optgroup label="Local — English only (faster, more accurate)">
+                  <option value="tiny.en">tiny.en</option>
+                  <option value="base.en">base.en</option>
+                  <option value="small.en">small.en</option>
+                  <option value="medium.en">medium.en</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="panel-row">
+              <div><b>Language</b><p class="muted">Blank = auto-detect (multilingual models only)</p></div>
+              <input id="language" class="w-med" list="langCodes" placeholder="auto" />
+              <datalist id="langCodes">
+                <option value="en">English</option>
+                <option value="id">Indonesian</option>
+                <option value="ms">Malay</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+                <option value="pt">Portuguese</option>
+                <option value="it">Italian</option>
+                <option value="nl">Dutch</option>
+                <option value="ru">Russian</option>
+                <option value="ar">Arabic</option>
+                <option value="hi">Hindi</option>
+                <option value="ja">Japanese</option>
+                <option value="ko">Korean</option>
+                <option value="zh">Chinese</option>
+                <option value="tr">Turkish</option>
+                <option value="th">Thai</option>
+                <option value="vi">Vietnamese</option>
+              </datalist>
+            </div>
+            <div class="panel-row">
+              <div><b>Transcript cleanup</b><p class="muted">Remove filler words and repetitions</p></div>
+              <select id="cleanupLevel" class="w-med">
+                <option value="0">Off</option>
+                <option value="1">Light — drop "um", "uh"; tidy punctuation</option>
+                <option value="2">Strong — also collapse repeated words</option>
+              </select>
+            </div>
+            <div class="panel-row">
+              <div><b>Translate dictation</b><p class="muted">Speak in one language, paste in another</p></div>
+              <label class="switch"><input id="translateEnabled" type="checkbox" /><span class="slider"></span></label>
+            </div>
+            <div class="panel-row">
+              <div><b>Translate to</b><p class="muted">Target language, e.g. "Indonesian"</p></div>
+              <input id="translateTo" class="w-med" placeholder="English" />
+            </div>
+            <div class="panel-row">
+              <div><b>Translation model</b><p class="muted">Chat model on the same base URL (needs /chat/completions)</p></div>
+              <input id="translateModel" class="w-med" placeholder="gpt-4o-mini" />
+            </div>
+            <div class="panel-row">
+              <div><b>Show floating pill</b><p class="muted">A small status capsule on screen while dictating</p></div>
+              <label class="switch"><input id="showPill" type="checkbox" /><span class="slider"></span></label>
+            </div>
+            <div class="panel-row">
+              <div><b>Context awareness</b><p class="muted">Send the focused app's text to improve names and jargon</p></div>
+              <label class="switch"><input id="contextAware" type="checkbox" /><span class="slider"></span></label>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button class="btn" id="settingsCancel">Cancel</button>
+            <button class="btn primary" id="settingsSave">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast hidden" id="toast"></div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

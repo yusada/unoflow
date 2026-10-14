@@ -1,0 +1,6 @@
+# Local STT server for UnoFlow. Install with:
+#   python -m pip install -r requirements.txt
+faster-whisper>=1.0.0
+fastapi>=0.110
+uvicorn>=0.27
+python-multipart>=0.0.9

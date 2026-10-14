@@ -1,0 +1,27 @@
+# Rust / Tauri
+/src-tauri/target/
+/src-tauri/gen/
+
+# Node
+node_modules/
+
+# Build output copied to the project root (produced by `cargo build`/`tauri build`;
+# the real artifacts live under src-tauri/target/ and are not committed)
+/UnoFlow.exe
+/WebView2Loader.dll
+*.exe
+*.dll
+
+# Python (local-stt)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local config / secrets
+.env
+*.local
+
+# Editor / OS
+.DS_Store
+Thumbs.db
