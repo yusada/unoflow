@@ -4,3 +4,8 @@ faster-whisper>=1.0.0
 fastapi>=0.110
 uvicorn>=0.27
 python-multipart>=0.0.9
+
+# Only needed to build the standalone unoflow-stt.exe:
+#   python -m pip install pyinstaller
+#   python -m PyInstaller --noconfirm --clean unoflow-stt.spec
+# pyinstaller>=6.0

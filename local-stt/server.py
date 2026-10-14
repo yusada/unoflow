@@ -24,6 +24,7 @@ Run:
 from __future__ import annotations
 
 import os
+import sys
 import tempfile
 
 from fastapi import FastAPI, File, Form, UploadFile
@@ -40,10 +41,18 @@ COMPUTE_TYPE = os.environ.get(
 # end with a pause.
 USE_VAD = os.environ.get("UNOFLOW_STT_VAD", "1") != "0"
 
-# A model folder shipped next to this script makes the app work offline with no
+# A model folder shipped next to the app makes it work offline with no
 # first-run download. `models/tiny/` holds the CTranslate2 files (model.bin,
 # tokenizer.json, vocabulary.txt, config.json) for the `tiny` model.
-BUNDLED_MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
+#
+# When frozen by PyInstaller, `__file__` points inside the temporary extraction
+# dir, so the model must be looked up next to the executable instead — that is
+# where the release zip puts it.
+if getattr(sys, "frozen", False):
+    _APP_DIR = os.path.dirname(os.path.abspath(sys.executable))
+else:
+    _APP_DIR = os.path.dirname(os.path.abspath(__file__))
+BUNDLED_MODEL_DIR = os.path.join(_APP_DIR, "models")
 
 
 def resolve_model(name: str) -> str:

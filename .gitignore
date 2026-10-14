@@ -22,6 +22,11 @@ venv/
 # committed: see local-stt/README.md. Keeps the repo at source-only size.
 /local-stt/models/
 
+# PyInstaller output for the standalone server (release zip only, ~320 MB).
+/local-stt/build/
+/local-stt/dist/
+/local-stt/*.log
+
 # Local config / secrets
 .env
 *.local

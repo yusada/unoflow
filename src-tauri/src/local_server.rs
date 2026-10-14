@@ -54,18 +54,35 @@ impl LocalServer {
         if !is_local_url(base_url) {
             return Ok(None);
         }
+
+        // Two ways to run the server, in order of preference:
+        //   1. `unoflow-stt.exe` — the bundled standalone build. Needs no Python.
+        //   2. `server.py` — a source checkout, run with a system interpreter.
+        let standalone = dir.join("unoflow-stt.exe");
         let script = dir.join("server.py");
-        if !script.is_file() {
+
+        let mut cmd = if standalone.is_file() {
+            let mut c = Command::new(&standalone);
+            c.current_dir(dir);
+            c
+        } else if script.is_file() {
+            let (exe, prefix) = python_launcher().ok_or_else(|| {
+                "no Python interpreter found (tried `py`, `python`), and no \
+                 bundled unoflow-stt.exe is present"
+                    .to_string()
+            })?;
+            let mut c = Command::new(&exe);
+            c.args(&prefix).arg(&script).current_dir(dir);
+            c
+        } else {
             eprintln!(
-                "[local-stt] base URL is local but {} was not found; \
+                "[local-stt] base URL is local but neither {} nor {} was found; \
                  not starting a server (expecting one to already be running)",
+                standalone.display(),
                 script.display()
             );
             return Ok(None);
-        }
-        let (exe, prefix) = python_launcher().ok_or_else(|| {
-            "no Python interpreter found (tried `py`, `python`)".to_string()
-        })?;
+        };
 
         // If something is already serving this port (e.g. a previous run was
         // force-killed and left its server behind), reuse it instead of
@@ -75,12 +92,8 @@ impl LocalServer {
             return Ok(None);
         }
 
-        let mut cmd = Command::new(&exe);
-        cmd.args(&prefix)
-            .arg(&script)
-            .current_dir(dir)
-            // Match the port we tell the app to use.
-            .env("UNOFLOW_STT_PORT", port.to_string())
+        // Match the port we tell the app to use.
+        cmd.env("UNOFLOW_STT_PORT", port.to_string())
             .stdout(Stdio::null())
             .stderr(Stdio::null());
         // Only push the model through when it's a Whisper name; cloud model
@@ -188,18 +201,24 @@ pub fn wait_until_ready(base_url: &str, timeout: Duration) -> bool {
 
 /// Where the bundled server lives: a `local-stt` folder next to the executable,
 /// falling back to `%APPDATA%\UnoFlow\local-stt`.
+///
+/// Either entry point marks the folder as valid: the standalone
+/// `unoflow-stt.exe` (release zip) or `server.py` (source checkout).
 pub fn server_dir() -> Option<PathBuf> {
+    let looks_like_server = |dir: &Path| {
+        dir.join("unoflow-stt.exe").is_file() || dir.join("server.py").is_file()
+    };
     if let Ok(exe) = std::env::current_exe() {
         if let Some(dir) = exe.parent() {
             let cand = dir.join("local-stt");
-            if cand.join("server.py").is_file() {
+            if looks_like_server(&cand) {
                 return Some(cand);
             }
         }
     }
     let appdata = std::env::var("APPDATA").ok()?;
     let cand = PathBuf::from(appdata).join("UnoFlow").join("local-stt");
-    if cand.join("server.py").is_file() {
+    if looks_like_server(&cand) {
         Some(cand)
     } else {
         None

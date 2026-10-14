@@ -177,10 +177,11 @@ Two backends are practical — `faster-whisper` (this repo, pip-installable,
 no compiler) or `whisper.cpp` (needs CMake + a C++ toolchain). See
 [`local-stt/README.md`](local-stt/README.md) for the comparison.
 
-> **No first-run download.** The portable release zip ships the `tiny` model
-> (~75 MB) in `local-stt/models/`, so offline mode works immediately with no
-> internet. A source checkout downloads the model on first use instead (cached
-> in `%USERPROFILE%\.cache\huggingface`).
+> **No Python, no download.** The portable release zip ships the `tiny` model
+> (~75 MB) in `local-stt/models/` **and** a standalone `unoflow-stt.exe` that
+> bundles Python and faster-whisper. Offline dictation works immediately on a
+> machine with nothing installed. A source checkout instead runs `server.py`
+> with your own Python and downloads the model on first use.
 
 > The local server is unauthenticated and binds to `127.0.0.1`. It only accepts
 > local connections — don't expose it.
@@ -233,6 +234,7 @@ unoflow/
 │     └─ appinfo.rs             # which app has focus
 └─ local-stt/                   # offline Whisper server (Python)
    ├─ server.py
+   ├─ unoflow-stt.spec         # PyInstaller spec for the standalone build
    ├─ requirements.txt
    ├─ README.md
    └─ models/                  # bundled Whisper weights (release zip only)

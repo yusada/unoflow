@@ -78,6 +78,27 @@ python server.py
 
 The first run downloads the model (cached in `%USERPROFILE%\.cache\huggingface`).
 
+### Standalone build (no Python needed)
+
+The portable release ships `local-stt/unoflow-stt.exe` — a PyInstaller build of
+this server with Python, `faster-whisper`, CTranslate2 and the VAD model all
+bundled. **You do not need Python installed.** UnoFlow prefers this exe over
+`server.py` when both are present, so the portable zip is zero-dependency.
+
+Build it yourself (from this folder, with `pyinstaller` installed):
+
+```powershell
+py -3.10 -m pip install pyinstaller
+py -3.10 -m PyInstaller --noconfirm --clean unoflow-stt.spec
+```
+
+Output: `dist/unoflow-stt/unoflow-stt.exe` (~320 MB with the model beside it —
+PyInstaller one-folder, because a one-file build would unpack that on every
+launch).
+
+`server.py` remains the source of truth: the exe is just it, frozen. Run the
+script directly when developing; ship the exe for users without Python.
+
 ### Bundled model (no download)
 
 The **portable release zip** ships a pre-downloaded `tiny` model in
