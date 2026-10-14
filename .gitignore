@@ -18,6 +18,10 @@ __pycache__/
 .venv/
 venv/
 
+# Bundled Whisper model weights (~75 MB). Shipped inside the release zip, not
+# committed: see local-stt/README.md. Keeps the repo at source-only size.
+/local-stt/models/
+
 # Local config / secrets
 .env
 *.local

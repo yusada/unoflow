@@ -57,10 +57,14 @@ will usually fall back to CPU. Model sizes:
 | Model | Disk | CPU speed | Notes |
 |---|---|---|---|
 | `tiny.en` | ~75 MB | fastest | lowest accuracy; fine for clear English |
-| `base.en` | ~140 MB | fast | **default here** — good balance for dictation |
+| `base.en` | ~140 MB | fast | **server default** — good balance for dictation |
 | `small.en` | ~460 MB | medium | noticeably better; use if CPU keeps up |
 | `medium.en` | ~1.5 GB | slow on this CPU | GPU-recommended, won't fit well in 3 GB |
 | `large-v3` | ~3 GB | too slow here | not realistic on this hardware |
+
+The portable release bundles the multilingual `tiny` model (~75 MB), which is
+UnoFlow's default — so it works offline immediately. The other sizes are
+downloaded on first use.
 
 English-only `.en` models are more accurate per size; drop the `.en` suffix for
 multilingual.
@@ -73,6 +77,34 @@ python server.py
 ```
 
 The first run downloads the model (cached in `%USERPROFILE%\.cache\huggingface`).
+
+### Bundled model (no download)
+
+The **portable release zip** ships a pre-downloaded `tiny` model in
+`local-stt/models/tiny/`. When that folder is present, the server loads it from
+disk instead of downloading anything — so offline mode works on first run, with
+no internet at all.
+
+Resolution order in `server.py`:
+
+1. `local-stt/models/<model>/model.bin` — the bundled copy, used if present.
+2. Otherwise the model name is passed to faster-whisper, which downloads it from
+   Hugging Face (cached as above).
+
+To bundle a different model, copy its CTranslate2 files into
+`local-stt/models/<name>/`:
+
+```
+local-stt/models/tiny/
+├─ model.bin
+├─ config.json
+├─ tokenizer.json
+└─ vocabulary.txt
+```
+
+Then set `UNOFLOW_STT_MODEL=tiny` (or pick it in UnoFlow's Settings). The
+`models/` folder is gitignored — it is shipped as a release asset, not committed.
+
 
 ### Trying the GPU anyway
 

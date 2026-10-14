@@ -177,6 +177,11 @@ Two backends are practical — `faster-whisper` (this repo, pip-installable,
 no compiler) or `whisper.cpp` (needs CMake + a C++ toolchain). See
 [`local-stt/README.md`](local-stt/README.md) for the comparison.
 
+> **No first-run download.** The portable release zip ships the `tiny` model
+> (~75 MB) in `local-stt/models/`, so offline mode works immediately with no
+> internet. A source checkout downloads the model on first use instead (cached
+> in `%USERPROFILE%\.cache\huggingface`).
+
 > The local server is unauthenticated and binds to `127.0.0.1`. It only accepts
 > local connections — don't expose it.
 
@@ -229,7 +234,8 @@ unoflow/
 └─ local-stt/                   # offline Whisper server (Python)
    ├─ server.py
    ├─ requirements.txt
-   └─ README.md
+   ├─ README.md
+   └─ models/                  # bundled Whisper weights (release zip only)
 ```
 
 ---

@@ -40,6 +40,23 @@ COMPUTE_TYPE = os.environ.get(
 # end with a pause.
 USE_VAD = os.environ.get("UNOFLOW_STT_VAD", "1") != "0"
 
+# A model folder shipped next to this script makes the app work offline with no
+# first-run download. `models/tiny/` holds the CTranslate2 files (model.bin,
+# tokenizer.json, vocabulary.txt, config.json) for the `tiny` model.
+BUNDLED_MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
+
+
+def resolve_model(name: str) -> str:
+    """Prefer a bundled model folder over the Hugging Face download.
+
+    Returns the local path when `models/<name>/model.bin` exists, otherwise the
+    original name so faster-whisper fetches it from the hub as before.
+    """
+    local = os.path.join(BUNDLED_MODEL_DIR, name)
+    if os.path.isfile(os.path.join(local, "model.bin")):
+        return local
+    return name
+
 app = FastAPI(title="UnoFlow local STT")
 _model: WhisperModel | None = None
 
@@ -48,8 +65,10 @@ def get_model() -> WhisperModel:
     """Load the model once, on first request."""
     global _model
     if _model is None:
-        print(f"[stt] loading {MODEL_NAME} ({DEVICE}/{COMPUTE_TYPE})…", flush=True)
-        _model = WhisperModel(MODEL_NAME, device=DEVICE, compute_type=COMPUTE_TYPE)
+        source = resolve_model(MODEL_NAME)
+        where = "bundled" if source != MODEL_NAME else "hub"
+        print(f"[stt] loading {MODEL_NAME} from {where} ({DEVICE}/{COMPUTE_TYPE})…", flush=True)
+        _model = WhisperModel(source, device=DEVICE, compute_type=COMPUTE_TYPE)
         print("[stt] ready", flush=True)
     return _model
 
